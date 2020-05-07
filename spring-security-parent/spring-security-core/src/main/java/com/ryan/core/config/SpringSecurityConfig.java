@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -54,10 +55,27 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.httpBasic()
-                .and()
-                .authorizeRequests() // 认证请求
-                .anyRequest().authenticated() // 所有进入应用的HTTP请求都要进行认证
+        // httpBasic弹出窗口认证
+        // formLogin表单认证方式
+        http.formLogin()
+            .loginPage("/login/page") // 指定表单登录页面
+            .loginProcessingUrl("/login/form") // 指定表单登录提交接口
+            .usernameParameter("name") // 指定用户名字段名 默认username
+            .passwordParameter("pwd") // 指定密码字段名 默认password
+            .and()
+            .authorizeRequests() // 认证请求
+            .antMatchers("/login/page").permitAll() // 放行/login/page请求
+            .anyRequest().authenticated() // 所有进入应用的HTTP请求都要进行认证
         ;
+    }
+
+    /**
+     * 一般针对静态资源放行
+     * @param web
+     * @throws Exception
+     */
+    @Override
+    public void configure(WebSecurity web){
+        web.ignoring().antMatchers("/dist/**", "/modules/**", "/plugins/**");
     }
 }
