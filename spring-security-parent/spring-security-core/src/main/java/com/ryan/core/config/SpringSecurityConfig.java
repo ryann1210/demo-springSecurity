@@ -1,7 +1,9 @@
 package com.ryan.core.config;
 
+import com.ryan.core.properties.SecurityProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -21,6 +23,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @Autowired
+    private SecurityProperties securityProperties;
 
     /**
      * 认证管理器：
@@ -58,13 +63,13 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         // httpBasic弹出窗口认证
         // formLogin表单认证方式
         http.formLogin()
-            .loginPage("/login/page") // 指定表单登录页面
-            .loginProcessingUrl("/login/form") // 指定表单登录提交接口
-            .usernameParameter("name") // 指定用户名字段名 默认username
-            .passwordParameter("pwd") // 指定密码字段名 默认password
+            .loginPage(securityProperties.getAuthentication().getLoginPage()) // 指定表单登录页面
+            .loginProcessingUrl(securityProperties.getAuthentication().getLoginProcessingUrl()) // 指定表单登录提交接口
+            .usernameParameter(securityProperties.getAuthentication().getUsernameParameter()) // 指定用户名字段名 默认username
+            .passwordParameter(securityProperties.getAuthentication().getPasswordParameter()) // 指定密码字段名 默认password
             .and()
             .authorizeRequests() // 认证请求
-            .antMatchers("/login/page").permitAll() // 放行/login/page请求
+            .antMatchers(securityProperties.getAuthentication().getLoginPage()).permitAll() // 放行/login/page请求
             .anyRequest().authenticated() // 所有进入应用的HTTP请求都要进行认证
         ;
     }
@@ -76,6 +81,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     public void configure(WebSecurity web){
-        web.ignoring().antMatchers("/dist/**", "/modules/**", "/plugins/**");
+        web.ignoring().antMatchers(securityProperties.getAuthentication().getStaticPaths());
     }
 }
