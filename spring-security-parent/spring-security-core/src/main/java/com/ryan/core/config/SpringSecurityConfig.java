@@ -13,6 +13,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity // 开启SpringSecurity过滤链
@@ -26,6 +28,10 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private SecurityProperties securityProperties;
+    @Autowired
+    private AuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    @Autowired
+    private AuthenticationFailureHandler customAuthenticationFailureHandler;
 
     /**
      * 认证管理器：
@@ -66,7 +72,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             .loginPage(securityProperties.getAuthentication().getLoginPage()) // 指定表单登录页面
             .loginProcessingUrl(securityProperties.getAuthentication().getLoginProcessingUrl()) // 指定表单登录提交接口
             .usernameParameter(securityProperties.getAuthentication().getUsernameParameter()) // 指定用户名字段名 默认username
-            .passwordParameter(securityProperties.getAuthentication().getPasswordParameter()) // 指定密码字段名 默认password
+            .passwordParameter(securityProperties.getAuthentication ().getPasswordParameter()) // 指定密码字段名 默认password
+            .successHandler(customAuthenticationSuccessHandler)
+            .failureHandler(customAuthenticationFailureHandler)
             .and()
             .authorizeRequests() // 认证请求
             .antMatchers(securityProperties.getAuthentication().getLoginPage()).permitAll() // 放行/login/page请求
