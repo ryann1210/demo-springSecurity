@@ -17,3 +17,4 @@ ryan:
         - /dist/**
         - /modules/**
         - /plugins/**
+      loginType: JSON # 认证之后响应的类型 JSON/REDIRECT

@@ -13,5 +13,7 @@ public class AuthenticationProperties {
     private String usernameParameter = "name";
     private String passwordParameter = "pwd";
     private String[] staticPaths = {"/dist/**", "/modules/**", "/plugins/**"};
+    // 认证响应类型 枚举类
+    private LoginResponseType loginType = LoginResponseType.REDIRECT;
 
 }
